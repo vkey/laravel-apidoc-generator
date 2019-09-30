@@ -73,7 +73,14 @@ class Generator
         $parsedRoute['response'] = $responses;
         $parsedRoute['showresponse'] = ! empty($responses);
 
+        
         $parsedRoute['headers'] = $rulesToApply['headers'] ?? [];
+        $headerParameters = $this->fetchHeaderParameters($controller, $method, $route, $rulesToApply, $parsedRoute);
+        if(!empty($headerParameters)){
+            foreach ($headerParameters as $key => $value) {
+                $parsedRoute['headers'][$key] = $value;
+            }
+        }
 
         $parsedRoute += $metadata;
 
@@ -96,6 +103,11 @@ class Generator
     protected function fetchBodyParameters(ReflectionClass $controller, ReflectionMethod $method, Route $route, array $rulesToApply, array $context = [])
     {
         return $this->iterateThroughStrategies('bodyParameters', $context, [$route, $controller, $method, $rulesToApply]);
+    }
+
+    protected function fetchHeaderParameters(ReflectionClass $controller, ReflectionMethod $method, Route $route, array $rulesToApply, array $context = [])
+    {
+        return $this->iterateThroughStrategies('headerParameters', $context, [$route, $controller, $method, $rulesToApply]);
     }
 
     protected function fetchQueryParameters(ReflectionClass $controller, ReflectionMethod $method, Route $route, array $rulesToApply, array $context = [])
@@ -129,6 +141,9 @@ class Generator
             ],
             'queryParameters' => [
                 \Mpociot\ApiDoc\Strategies\QueryParameters\GetFromQueryParamTag::class,
+            ],
+            'headerParameters' => [
+                \Mpociot\ApiDoc\Strategies\HeaderParameters\GetFromHeaderParamTag::class,
             ],
             'responses' => [
                 \Mpociot\ApiDoc\Strategies\Responses\UseResponseTag::class,
