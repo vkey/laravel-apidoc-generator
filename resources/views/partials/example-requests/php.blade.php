@@ -17,7 +17,19 @@ $response = $client->{{ strtolower($route['methods'][0]) }}("{{ rtrim($baseUrl, 
     ],
 @endif
 @if(!empty($route['cleanBodyParameters']))
-    'json' => [
+    @php
+        if(isset($route['headers']['Content-Type'])){
+            if(preg_match('#multipart#i', $route['headers']['Content-Type'])){
+                $bodyType = 'multipart';
+        }elseif (preg_match('#application/x-www-form-urlencoded#i', $route['headers']['Content-Type'])){
+                $bodyType = 'form_params';
+        }
+        else{
+            $bodyType = 'json';
+            }
+        }
+    @endphp
+    '{{$bodyType}}' => [
     @foreach($route['cleanBodyParameters'] as $parameter => $value)
         "{{$parameter}}" => "{{$value}}",
     @endforeach

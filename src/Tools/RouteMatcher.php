@@ -38,6 +38,7 @@ class RouteMatcher
 
                 if ($this->shouldIncludeRoute($route, $routeRule, $includes, $usingDingoRouter)) {
                     $matchedRoutes[] = [
+                        'baseUrl' => $routeRule['baseUrl'],
                         'route' => $route,
                         'apply' => $routeRule['apply'] ?? [],
                     ];

@@ -42,12 +42,13 @@ class Generator
     }
 
     /**
+     * @param string $baseUrl
      * @param \Illuminate\Routing\Route $route
      * @param array $rulesToApply Rules to apply when generating documentation for this route
      *
      * @return array
      */
-    public function processRoute(Route $route, array $rulesToApply = [])
+    public function processRoute($baseUrl, Route $route, array $rulesToApply = [])
     {
         list($controllerName, $methodName) = Utils::getRouteClassAndMethodNames($route->getAction());
         $controller = new ReflectionClass($controllerName);
@@ -56,6 +57,7 @@ class Generator
         $parsedRoute = [
             'id' => md5($this->getUri($route).':'.implode($this->getMethods($route))),
             'methods' => $this->getMethods($route),
+            'baseUrl' => $baseUrl,
             'uri' => $this->getUri($route),
             'boundUri' => Utils::getFullUrl($route, $rulesToApply['bindings'] ?? ($rulesToApply['response_calls']['bindings'] ?? [])),
         ];

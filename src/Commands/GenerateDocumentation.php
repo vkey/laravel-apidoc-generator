@@ -118,7 +118,7 @@ class GenerateDocumentation extends Command
                 $route['output'] = (string) view('apidoc::partials.route')
                     ->with('route', $route)
                     ->with('settings', $settings)
-                    ->with('baseUrl', $this->baseUrl)
+                    ->with('baseUrl', $route['baseUrl'] ?? $this->baseUrl)
                     ->render();
 
                 return $route;
@@ -230,7 +230,7 @@ class GenerateDocumentation extends Command
             $route = $routeItem['route'];
             /** @var Route $route */
             if ($this->isValidRoute($route) && $this->isRouteVisibleForDocumentation($route->getAction())) {
-                $parsedRoutes[] = $generator->processRoute($route, $routeItem['apply']);
+                $parsedRoutes[] = $generator->processRoute($routeItem['baseUrl'], $route, $routeItem['apply']);
                 $this->info('Processed route: ['.implode(',', $generator->getMethods($route)).'] '.$generator->getUri($route));
             } else {
                 $this->warn('Skipping route: ['.implode(',', $generator->getMethods($route)).'] '.$generator->getUri($route));
